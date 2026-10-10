@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shape World — Year 2 Mathematics</title>
+<style>
+  :root{
+    --sky:#9edcff; --cream:#fff8df; --yellow:#ffd95a; --orange:#ff9f43;
+    --green:#79d68a; --blue:#4b9ee8; --ink:#25445c; --pink:#ff8fa3;
+    --white:#fff; --shadow:0 10px 0 rgba(37,68,92,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:"Trebuchet MS",Arial,sans-serif;color:var(--ink)}
+  body{
+    background:
+      radial-gradient(circle at 10% 10%, rgba(255,255,255,.8) 0 32px, transparent 33px),
+      radial-gradient(circle at 88% 18%, rgba(255,255,255,.7) 0 42px, transparent 43px),
+      linear-gradient(#9edcff 0%,#cceeff 55%,#f9eecb 55%,#fff5dc 100%);
+    overflow-x:hidden;
+  }
+  button{font:inherit}
+  .app{min-height:100vh;position:relative;overflow:hidden}
+  .cloud{position:fixed;background:#fff;border-radius:999px;opacity:.8;z-index:0;pointer-events:none}
+  .cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%}
+  .cloud.one{width:150px;height:38px;left:3%;top:9%}
+  .cloud.one:before{width:60px;height:60px;left:25px;top:-30px}.cloud.one:after{width:48px;height:48px;left:78px;top:-22px}
+  .cloud.two{width:190px;height:42px;right:2%;top:27%}
+  .cloud.two:before{width:72px;height:72px;left:42px;top:-36px}.cloud.two:after{width:55px;height:55px;left:108px;top:-25px}
+  .topbar{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;min-height:66px}
+  .brand{font-weight:900;letter-spacing:1px;font-size:18px}
+  .progress-wrap{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.7);padding:7px 12px;border-radius:999px;border:3px solid rgba(255,255,255,.8)}
+  .dots{display:flex;gap:5px}.dot{width:11px;height:11px;border-radius:50%;background:#d6e5ec;border:2px solid #fff}.dot.done{background:var(--green)}.dot.current{background:var(--yellow)}
+  .sound-btn{width:46px;height:46px;border:3px solid var(--ink);background:var(--white);border-radius:50%;cursor:pointer;box-shadow:0 4px 0 rgba(37,68,92,.16);font-size:21px}
+  .sound-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(37,68,92,.16)}
+  .screen{display:none;position:relative;z-index:2;min-height:calc(100vh - 66px);padding:20px 18px 42px;align-items:center;justify-content:center}
+  .screen.active{display:flex;animation:pageIn .45s ease}
+  @keyframes pageIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+  .panel{width:min(960px,100%);background:rgba(255,250,231,.96);border:5px solid var(--ink);border-radius:34px;box-shadow:var(--shadow);padding:30px;position:relative}
+  .cover-panel{text-align:center;padding:34px 24px 40px;overflow:hidden}
+  .cover-title{font-size:clamp(44px,8vw,84px);line-height:.95;margin:10px 0;color:var(--blue);text-shadow:4px 4px 0 #fff;font-weight:1000;letter-spacing:2px}
+  .subtitle{font-size:clamp(19px,3vw,28px);font-weight:800;margin:12px 0 24px}
+  .scene{display:flex;justify-content:center;align-items:center;gap:18px;flex-wrap:wrap;margin:10px auto 26px}
+  .shape-icon{width:95px;height:95px;display:grid;place-items:center;filter:drop-shadow(0 5px 0 rgba(37,68,92,.13));animation:bob 3s ease-in-out infinite}
+  .shape-icon:nth-child(2){animation-delay:.2s}.shape-icon:nth-child(3){animation-delay:.4s}.shape-icon:nth-child(4){animation-delay:.6s}
+  @keyframes bob{50%{transform:translateY(-7px) rotate(2deg)}}
+  .explorer{margin:8px auto 8px;width:130px;height:140px;position:relative}
+  .explorer .head{position:absolute;width:75px;height:75px;border:4px solid var(--ink);background:#ffd7b5;border-radius:50%;left:27px;top:16px;z-index:2}
+  .explorer .hat{position:absolute;width:92px;height:30px;border:4px solid var(--ink);background:var(--orange);border-radius:50% 50% 30% 30%;left:19px;top:5px;z-index:3}
+  .explorer .body{position:absolute;width:90px;height:65px;border:4px solid var(--ink);background:var(--green);border-radius:28px 28px 20px 20px;left:20px;top:80px}
+  .explorer .eye{position:absolute;width:8px;height:11px;background:var(--ink);border-radius:50%;top:46px}.explorer .eye.l{left:48px}.explorer .eye.r{left:76px}
+  .explorer .smile{position:absolute;width:24px;height:10px;border-bottom:4px solid var(--ink);border-radius:50%;top:61px;left:51px}
+  .primary-btn,.secondary-btn{
+    border:4px solid var(--ink);border-radius:18px;padding:13px 26px;font-size:21px;font-weight:900;cursor:pointer;
+    box-shadow:0 6px 0 rgba(37,68,92,.18);transition:.12s;min-height:54px
+  }
+  .primary-btn{background:var(--yellow)}.secondary-btn{background:#fff}
+  .primary-btn:hover,.secondary-btn:hover,.answer:hover{transform:translateY(-2px)}
+  .primary-btn:active,.secondary-btn:active,.answer:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(37,68,92,.18)}
+  button:focus-visible{outline:4px dashed var(--blue);outline-offset:3px}
+  h1,h2,h3{margin:0 0 12px}
+  .screen-title{text-align:center;font-size:clamp(30px,5vw,48px);font-weight:1000;color:var(--blue)}
+  .instruction{text-align:center;font-size:21px;font-weight:800;margin:8px auto 20px;max-width:680px}
+  .intro-box{max-width:720px;margin:0 auto;text-align:center}
+  .intro-box .mini-shapes{display:flex;justify-content:center;gap:14px;margin:24px 0}.mini-shape{width:65px;height:65px}
+  .shape-layout{display:grid;grid-template-columns:minmax(300px,1fr) minmax(220px,310px);gap:22px;align-items:center}
+  .shape-board{background:#e8f7ff;border:4px dashed #78bce8;border-radius:26px;padding:18px;min-height:390px;display:grid;place-items:center;position:relative}
+  .shape-svg{width:min(100%,450px);height:350px;overflow:visible}
+  .visible-shape{fill:#ffd95a;stroke:var(--ink);stroke-width:6;stroke-linejoin:round}
+  .side-hit{fill:none;stroke:transparent;stroke-width:24;stroke-linecap:round;cursor:pointer;pointer-events:stroke}
+  .side-visible{fill:none;stroke:var(--ink);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+  .side-hit.selected{stroke:#ff9f43;stroke-width:25}.side-visible.selected{stroke:#ff8a24;stroke-width:9}
+  .corner-hit{fill:transparent;stroke:transparent;cursor:pointer}.corner-hit.selected{fill:#ff8fa3;stroke:#fff;stroke-width:3}
+  .circle-hit{fill:none;stroke:transparent;stroke-width:28;cursor:pointer}.circle-visible{fill:#ffd95a;stroke:var(--ink);stroke-width:6}.circle-hit.selected{stroke:#ff8a24;stroke-width:30}
+  .info-box{background:#fff;border:4px solid var(--ink);border-radius:24px;padding:20px;box-shadow:0 6px 0 rgba(37,68,92,.08)}
+  .counter{font-size:25px;font-weight:1000;text-align:center;background:#fff8df;border-radius:16px;padding:12px;margin:8px 0 12px}
+  .feedback{min-height:62px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;font-size:18px;line-height:1.25}
+  .summary{margin-top:18px;padding:18px;border:4px solid var(--green);border-radius:20px;background:#effff1;display:none}
+  .summary.show{display:block;animation:pop .35s ease}.summary h2{text-align:center;color:#3c9b53}.summary ul{margin:10px 0;padding-left:24px;font-size:19px;font-weight:800}
+  @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+  .nav-row{display:flex;justify-content:center;gap:12px;margin-top:18px;flex-wrap:wrap}
+  .quick-nav{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin:0 auto 18px;max-width:900px}
+  .quick-nav button{border:3px solid #25445c;background:#fff8df;color:#25445c;border-radius:16px;padding:10px 14px;font-size:14px;font-weight:1000;cursor:pointer;box-shadow:0 3px 0 rgba(37,68,92,.12);transition:.15s transform,.15s background}
+  .quick-nav button:hover,.quick-nav button:focus-visible{transform:translateY(-2px);background:#e8f7ff;outline:none}
+  .quick-nav button.active{background:#ffd95a}
+  .quick-nav .home-nav{background:#d8f2df}
+  .quick-nav .quiz-nav{background:#ffd8e2}
+  .quick-nav .lab-nav{background:#d9c9ff}
+  .lab-panel{max-width:960px}
+  .lab-card{background:#fff;border:4px solid var(--ink);border-radius:24px;padding:18px;margin-top:12px}
+  .lab-question{margin-top:16px;background:#fff8df;border:3px solid #f0c54d;border-radius:18px;padding:14px;text-align:center}
+  .lab-question h3{margin:0 0 8px;font-size:20px}
+  .lab-question-text{font-size:18px;font-weight:1000;margin:8px 0 12px}
+  .lab-answer-row{display:flex;justify-content:center;gap:9px;flex-wrap:wrap}
+  .lab-answer{border:3px solid var(--ink);border-radius:13px;background:#fff;padding:9px 16px;font-weight:1000;cursor:pointer;box-shadow:0 3px 0 rgba(37,68,92,.12)}
+  .lab-answer:hover{transform:translateY(-2px);background:#eef9ff}
+  .lab-answer.correct{background:#79d68a;border-color:#2e8244}
+  .lab-answer.wrong{background:#ffb1a8;border-color:#c95345}
+  .lab-answer:disabled{cursor:default;opacity:.9;transform:none}
+  .lab-q-feedback{min-height:25px;margin-top:9px;font-weight:900}
+
+  .lab-stage{background:#e8f7ff;border:4px dashed #78bce8;border-radius:22px;min-height:310px;display:grid;place-items:center;position:relative;overflow:hidden}
+  .lab-stage svg{width:min(100%,390px);height:290px;overflow:visible}
+  .lab-shape{fill:#ffd95a;stroke:var(--ink);stroke-width:7;stroke-linejoin:round;transform-box:fill-box;transform-origin:center;transition:transform .65s cubic-bezier(.2,.8,.2,1)}
+  .lab-shape.circle{transform-box:view-box}
+  .lab-controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:15px}
+  .lab-controls button{border:3px solid var(--ink);border-radius:15px;background:#fff8df;padding:10px 16px;font-weight:1000;cursor:pointer;box-shadow:0 4px 0 rgba(37,68,92,.12);transition:.12s}
+  .lab-controls button:hover{transform:translateY(-2px);background:#e8f7ff}
+  .lab-message{text-align:center;font-size:20px;font-weight:1000;min-height:54px;padding:12px 8px}
+  .feature-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+  .feature-box{border:3px solid #dbe8ee;border-radius:16px;background:#fffdf3;padding:12px;text-align:center;font-weight:900}
+  .feature-number{font-size:28px;color:var(--blue);display:block}
+  .same-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}
+  .same-option{border:4px solid var(--ink);border-radius:18px;background:#fff;padding:12px;min-height:270px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;font-weight:1000;transition:.15s}
+  .same-option:hover{transform:translateY(-3px);background:#f7fcff}
+  .same-option.correct{background:#baf0c2;border-color:#3d9c53}
+  .same-option.wrong{background:#ffe0a6;border-color:#e29a35}
+  .same-badge{align-self:flex-start;background:#ffd95a;border:3px solid var(--ink);border-radius:12px;padding:4px 10px;font-size:18px}
+  .same-visual{height:105px;display:grid;place-items:center}
+  .same-option svg{width:105px;height:105px}
+  .same-prompt{text-align:center;font-size:17px;line-height:1.15;min-height:42px}
+  .tf-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%}
+  .tf-btn{border:3px solid var(--ink);border-radius:12px;background:#fff;padding:9px 5px;font-weight:1000;font-size:14px;cursor:pointer;box-shadow:0 3px 0 rgba(37,68,92,.12)}
+  .tf-btn:hover{transform:translateY(-2px);background:#eef9ff}
+  .tf-btn:disabled{cursor:default;opacity:.85;transform:none}
+  .tf-btn.correct{background:#79d68a;border-color:#2e8244}
+  .tf-btn.wrong{background:#ffb1a8;border-color:#c95345}
+  .lab-tip{background:#fff8df;border:3px solid #f0c54d;border-radius:18px;padding:14px;text-align:center;font-size:18px;font-weight:900;margin-top:14px}
+  .lab-shape-picker{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:14px 0}
+  .lab-shape-picker button{border:3px solid var(--ink);border-radius:15px;background:#fff;padding:10px 14px;font-weight:1000;cursor:pointer;box-shadow:0 3px 0 rgba(37,68,92,.12)}
+  .lab-shape-picker button.active{background:#ffd95a;transform:translateY(-2px)}
+  .audio-card{background:#eef9ff;border:4px solid #78bce8;border-radius:22px;padding:16px;margin-top:14px;text-align:center}
+  .audio-controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .audio-controls button{border:3px solid var(--ink);border-radius:15px;background:#fff;padding:10px 15px;font-weight:1000;cursor:pointer;box-shadow:0 3px 0 rgba(37,68,92,.12)}
+  .audio-status{font-weight:900;min-height:24px;margin-top:8px}
+
+  @media(max-width:900px){.same-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:700px){.feature-row,.same-grid{grid-template-columns:1fr}.lab-stage{min-height:280px}}
+
+  .compare{margin-top:18px;background:#fff;border:3px solid #f0c54d;border-radius:18px;padding:15px}
+  .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.compare-item{border:3px solid #dbe8ee;border-radius:15px;padding:10px;background:#fffdf3}.compare-item strong{display:block;font-size:19px}
+  .real-scene{border:4px solid var(--ink);border-radius:26px;background:#c9efff;padding:18px;min-height:290px;display:grid;place-items:center;overflow:hidden}
+  .scene-svg{width:100%;height:300px;max-width:720px}
+  .question{font-size:24px;text-align:center;font-weight:1000;margin:20px 0 14px}
+  .answers{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .answer{border:4px solid var(--ink);border-radius:16px;padding:13px 8px;background:#fff;font-weight:1000;cursor:pointer;min-height:58px;box-shadow:0 5px 0 rgba(37,68,92,.13);transition:.12s}
+  .answer.correct{background:#baf0c2;border-color:#3d9c53}.answer.wrong{background:#ffe0a6;border-color:#e29a35}
+  .real-feedback{min-height:54px;text-align:center;font-weight:900;font-size:18px;padding:12px}
+  .question-count{text-align:center;font-weight:900;margin-top:5px}
+  .finish-panel{text-align:center}.score-card{display:inline-block;margin:10px auto 18px;padding:14px 24px;border:4px solid var(--ink);border-radius:18px;background:#fff8df;font-size:25px;font-weight:1000;box-shadow:0 5px 0 rgba(37,68,92,.14)}.wrong-review{max-width:850px;margin:18px auto;text-align:left}.wrong-review h3{text-align:center;margin:12px 0 16px}.wrong-review-item{background:#fff4f4;border:3px solid #ef7777;border-radius:16px;padding:14px 16px;margin:10px 0;font-size:17px;line-height:1.45}.wrong-review-item div{margin-top:5px}.perfect-review,.retry-success{background:#dff7e4;border:3px solid #4aa564;border-radius:16px;padding:14px;margin:12px auto;font-size:19px;font-weight:900;text-align:center}.badge{display:inline-block;margin:16px auto;padding:13px 20px;border:4px solid var(--ink);border-radius:20px;background:var(--yellow);font-weight:1000;font-size:22px;box-shadow:0 5px 0 rgba(37,68,92,.14)}
+  .learned{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px 0}.learned span{background:#fff;border:3px solid var(--ink);padding:10px 14px;border-radius:15px;font-weight:900}
+  .star{position:absolute;font-size:26px;animation:twinkle 2.2s infinite ease-in-out;pointer-events:none}.star.a{left:7%;top:14%}.star.b{right:8%;top:11%;animation-delay:.5s}.star.c{left:14%;bottom:8%;animation-delay:1s}.star.d{right:14%;bottom:12%;animation-delay:1.4s}
+  @keyframes twinkle{50%{transform:scale(1.3) rotate(15deg);opacity:.55}}
+  .confetti{position:fixed;inset:0;pointer-events:none;z-index:50;display:none}.confetti.show{display:block}
+  .confetti i{position:absolute;width:10px;height:18px;border-radius:3px;animation:fall 1.4s ease-out forwards}
+  @keyframes fall{from{transform:translateY(-30px) rotate(0);opacity:1}to{transform:translateY(95vh) rotate(600deg);opacity:0}}
+
+  .certificate-builder{margin:22px auto 10px;max-width:900px;background:#eef9ff;border:4px solid var(--ink);border-radius:24px;padding:18px;box-shadow:0 5px 0 rgba(37,68,92,.12)}
+  .certificate-builder h2{margin:0 0 6px;font-size:25px}.certificate-builder p{margin:6px 0 12px;font-weight:800}
+  .certificate-controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;align-items:center}.certificate-controls input{font:inherit;font-weight:800;border:3px solid var(--ink);border-radius:14px;padding:11px 14px;min-width:230px;outline:none}
+  .certificate{margin:18px auto 0;max-width:850px;padding:30px 24px;border:8px double var(--ink);border-radius:24px;background:#fffdf3;position:relative;overflow:hidden}
+  .certificate:before,.certificate:after{content:'⭐';position:absolute;font-size:34px;opacity:.85}.certificate:before{left:18px;top:14px}.certificate:after{right:18px;bottom:14px}
+  .certificate-kicker{font-weight:1000;letter-spacing:2px;font-size:15px}.certificate h2{font-size:38px;margin:8px 0;color:var(--ink)}.certificate-name{font-size:32px;font-weight:1000;margin:12px 0;border-bottom:3px solid var(--ink);display:inline-block;padding:0 18px 5px}.certificate-text{font-size:18px;font-weight:800;line-height:1.5}.certificate-score{font-size:22px;font-weight:1000;margin:14px 0}.certificate-footer{display:flex;justify-content:space-between;gap:15px;margin-top:24px;font-weight:800;font-size:14px}
+  body.certificate-print-mode{background:#fff!important}
+  body.certificate-print-mode .app>header,
+  body.certificate-print-mode .quick-nav,
+  body.certificate-print-mode #confetti,
+  body.certificate-print-mode main>.screen:not(#finishScreen),
+  body.certificate-print-mode .wrong-review,
+  body.certificate-print-mode .score-card,
+  body.certificate-print-mode .badge,
+  body.certificate-print-mode .learned,
+  body.certificate-print-mode .finish-panel>h3,
+  body.certificate-print-mode .finish-panel>p,
+  body.certificate-print-mode .finish-panel>.nav-row,
+  body.certificate-print-mode .certificate-builder>h2,
+  body.certificate-print-mode .certificate-builder>p,
+  body.certificate-print-mode .certificate-controls{display:none!important}
+  body.certificate-print-mode #finishScreen{display:block!important;min-height:auto!important;padding:0!important}
+  body.certificate-print-mode .finish-panel{border:none!important;box-shadow:none!important;padding:0!important;background:#fff!important}
+  body.certificate-print-mode .certificate-builder{display:block!important;background:#fff!important;border:none!important;box-shadow:none!important;padding:0!important;max-width:none!important}
+  body.certificate-print-mode .certificate{display:block!important;max-width:none;margin:15mm auto;padding:25mm 18mm;box-shadow:none}
+  @media print{body{background:#fff!important}.app>header,main>.screen:not(#finishScreen),#confetti,.quick-nav,.wrong-review,.score-card,.badge,.learned,.finish-panel>h3,.finish-panel>p,.finish-panel>.nav-row,.certificate-builder{display:none!important}.screen#finishScreen{display:block!important;min-height:auto!important;padding:0!important}.finish-panel{border:none!important;box-shadow:none!important;padding:0!important;background:#fff!important}.certificate-builder{display:block!important;background:#fff!important;border:none!important;box-shadow:none!important;padding:0!important}.certificate-builder>h2,.certificate-builder>p,.certificate-controls{display:none!important}.certificate{display:block!important;max-width:none;margin:20mm auto;padding:28mm 18mm;border-width:8px;box-shadow:none}.certificate h2{font-size:38pt}.certificate-name{font-size:30pt}.certificate-text{font-size:16pt}.certificate-score{font-size:20pt}}
+  .hidden{display:none!important}
+  @media(max-width:760px){
+    .topbar{padding:10px 12px}.brand{font-size:15px}.progress-wrap{font-size:13px}.dot{width:9px;height:9px}
+    .screen{padding:10px 10px 30px}.panel{padding:20px 14px;border-width:4px;border-radius:25px}
+    .shape-layout{grid-template-columns:1fr}.shape-board{min-height:330px}.shape-svg{height:300px}
+    .answers{grid-template-columns:1fr 1fr}.primary-btn,.secondary-btn{font-size:18px;padding:12px 18px}
+    .compare-grid{grid-template-columns:1fr}
+  }
+  @media(max-width:430px){
+    .progress-wrap{display:none}.shape-board{padding:5px}.shape-svg{height:270px}
+    .question{font-size:20px}.answer{font-size:16px}.instruction{font-size:18px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="cloud one"></div><div class="cloud two"></div>
+  <header class="topbar">
+    <div class="brand">🌎 SHAPE WORLD</div>
+    <div class="progress-wrap" aria-label="Lesson progress">
+      <span id="progressText">1 / 6</span>
+      <div class="dots" id="dots"></div>
+    </div>
+    <button class="sound-btn" id="soundToggle" aria-label="Turn sound off" title="Sound on">🔊</button>
+  </header>
+
+  <main>
+    <section class="screen active" id="coverScreen" data-step="1">
+      <div class="panel cover-panel">
+        <span class="star a">⭐</span><span class="star b">✦</span><span class="star c">★</span><span class="star d">✦</span>
+        <div class="explorer" aria-label="Cute explorer character">
+          <div class="hat"></div><div class="head"><i class="eye l"></i><i class="eye r"></i><i class="smile"></i></div><div class="body"></div>
+        </div>
+        <div class="cover-title">SHAPE WORLD</div>
+        <div class="subtitle">Let's discover 2-D shapes!</div>
+        <div class="scene" aria-label="Four shape illustrations">
+          <div class="shape-icon"><svg viewBox="0 0 100 100"><rect x="16" y="16" width="68" height="68" rx="5" fill="#ffd95a" stroke="#25445c" stroke-width="6"/></svg></div>
+          <div class="shape-icon"><svg viewBox="0 0 100 100"><rect x="9" y="24" width="82" height="52" rx="5" fill="#79d68a" stroke="#25445c" stroke-width="6"/></svg></div>
+          <div class="shape-icon"><svg viewBox="0 0 100 100"><polygon points="50,10 88,85 12,85" fill="#ff9f43" stroke="#25445c" stroke-width="6" stroke-linejoin="round"/></svg></div>
+          <div class="shape-icon"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="37" fill="#9edcff" stroke="#25445c" stroke-width="6"/></svg></div>
+        </div>
+        <button class="primary-btn" id="startBtn">START 🚀</button>
+      </div>
+    </section>
+
+    <section class="screen" id="learnScreen" data-step="2">
+      <div class="panel intro-box">
+        <h1 class="screen-title">Let's find some shapes!</h1>
+        <p class="instruction">Tap the shape to explore it. Ready, little explorer?</p>
+        <div class="mini-shapes">
+          <div class="mini-shape"><svg viewBox="0 0 80 80"><rect x="12" y="12" width="56" height="56" rx="4" fill="#ffd95a" stroke="#25445c" stroke-width="5"/></svg></div>
+          <div class="mini-shape"><svg viewBox="0 0 80 80"><rect x="8" y="20" width="64" height="40" rx="4" fill="#79d68a" stroke="#25445c" stroke-width="5"/></svg></div>
+          <div class="mini-shape"><svg viewBox="0 0 80 80"><polygon points="40,8 70,68 10,68" fill="#ff9f43" stroke="#25445c" stroke-width="5"/></svg></div>
+          <div class="mini-shape"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="30" fill="#9edcff" stroke="#25445c" stroke-width="5"/></svg></div>
+        </div>
+        <p style="font-size:18px;font-weight:800">We will <b>SEE → TAP → COUNT → DISCOVER → IDENTIFY</b> together!</p>
+        <div class="quick-nav" aria-label="Choose a learning path">
+          <button class="home-nav" data-nav="home">🏠 HOME</button>
+          <button data-shape-nav="0">⬛ SQUARE</button>
+          <button data-shape-nav="1">▭ RECTANGLE</button>
+          <button data-shape-nav="2">🔺 TRIANGLE</button>
+          <button data-shape-nav="3">⚪ CIRCLE</button>
+          <button class="lab-nav" data-nav="lab">🧪 SHAPE LAB</button>
+          <button class="quiz-nav" data-nav="quiz">🧠 GO TO QUIZ</button>
+        </div>
+        <div class="nav-row"><button class="primary-btn" id="learnStartBtn">START WITH SQUARE →</button></div>
+      </div>
+    </section>
+
+    <section class="screen" id="shapeScreen" data-step="3">
+      <div class="panel">
+        <div class="quick-nav" aria-label="Choose where to go">
+          <button class="home-nav" data-nav="home">🏠 HOME</button>
+          <button data-shape-nav="0">⬛ SQUARE</button>
+          <button data-shape-nav="1">▭ RECTANGLE</button>
+          <button data-shape-nav="2">🔺 TRIANGLE</button>
+          <button data-shape-nav="3">⚪ CIRCLE</button>
+          <button class="lab-nav" data-nav="lab">🧪 SHAPE LAB</button>
+          <button class="quiz-nav" data-nav="quiz">🧠 QUIZ</button>
+        </div>
+        <h1 class="screen-title" id="shapeTitle">SQUARE</h1>
+        <p class="instruction" id="shapeInstruction">Tap every straight side.</p>
+        <div class="shape-layout">
+          <div class="shape-board" id="shapeBoard"></div>
+          <aside class="info-box">
+            <div class="counter" id="counter">Straight sides: 0</div>
+            <div class="feedback" id="shapeFeedback">Find each one and count carefully! 👆</div>
+            <div class="summary" id="summary"></div>
+          </aside>
+        </div>
+        <div class="nav-row">
+          <button class="primary-btn hidden" id="nextShapeBtn">NEXT →</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="labScreen" data-step="4">
+      <div class="panel lab-panel">
+        <div class="quick-nav" aria-label="Choose where to go">
+          <button class="home-nav" data-nav="home">🏠 HOME</button>
+          <button data-shape-nav="0">⬛ SQUARE</button>
+          <button data-shape-nav="1">▭ RECTANGLE</button>
+          <button data-shape-nav="2">🔺 TRIANGLE</button>
+          <button data-shape-nav="3">⚪ CIRCLE</button>
+          <button class="lab-nav active" data-nav="lab">🧪 SHAPE LAB</button>
+          <button class="quiz-nav" data-nav="quiz">🧠 QUIZ</button>
+        </div>
+        <h1 class="screen-title">🧪 SHAPE LAB</h1>
+        <p class="instruction">Let’s experiment! A shape can turn or change size — but is it still the same shape?</p>
+
+        <div class="lab-card">
+          <h2 style="text-align:center">🎨 CHOOSE A SHAPE TO EXPERIMENT</h2>
+          <p class="instruction" style="font-size:18px">Choose any shape. You can experiment with <b>all four shapes</b>!</p>
+          <div class="lab-shape-picker" id="labShapePicker" aria-label="Choose shape for Shape Lab">
+            <button data-lab-shape="0">⬛ SQUARE</button>
+            <button data-lab-shape="1">▭ RECTANGLE</button>
+            <button data-lab-shape="2">🔺 TRIANGLE</button>
+            <button data-lab-shape="3">⚪ CIRCLE</button>
+          </div>
+
+          <h2 style="text-align:center">🔄 TURN ME!</h2>
+          <p class="instruction" style="font-size:18px;margin-bottom:10px">Turn the shape. Watch its position change, then check its features.</p>
+          <div class="lab-stage" id="labStage" aria-label="Interactive shape laboratory"></div>
+          <div class="lab-controls">
+            <button id="labRotateBtn">🔄 ROTATE 45°</button>
+            <button id="labResetBtn">↩️ RESET</button>
+            <button id="labResizeBtn">📏 CHANGE SIZE</button>
+            <button id="labInspectBtn">🔍 INSPECT</button>
+          </div>
+          <div class="lab-message" id="labMessage">Try turning the shape. What do you notice?</div>
+          <div class="feature-row" id="labFeatures">
+            <div class="feature-box"><span class="feature-number" id="labSides">4</span>straight sides</div>
+            <div class="feature-box"><span class="feature-number" id="labCorners">4</span>corners</div>
+            <div class="feature-box"><span class="feature-number" id="labName">SQUARE</span>shape name</div>
+          </div>
+
+          <div class="lab-question">
+            <h3>🔄 ROTATE QUESTION</h3>
+            <div class="lab-question-text" id="rotateQuestion">If we turn the square, is it still a square?</div>
+            <div class="lab-answer-row" id="rotateAnswers"></div>
+            <div class="lab-q-feedback" id="rotateFeedback" aria-live="polite"></div>
+          </div>
+
+          <div class="lab-question">
+            <h3>📏 SIZE QUESTION</h3>
+            <div class="lab-question-text" id="resizeQuestion">If the square becomes bigger, does its number of sides change?</div>
+            <div class="lab-answer-row" id="resizeAnswers"></div>
+            <div class="lab-q-feedback" id="resizeFeedback" aria-live="polite"></div>
+          </div>
+
+          <div class="lab-question">
+            <h3>🔍 INSPECT QUESTION</h3>
+            <div class="lab-question-text" id="inspectQuestion">How many corners does a square have?</div>
+            <div class="lab-answer-row" id="inspectAnswers"></div>
+            <div class="lab-q-feedback" id="inspectFeedback" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="lab-tip">💡 <b>SHAPE DETECTIVE RULE:</b> Look at the number and type of sides and corners — not which way the shape is facing!</div>
+
+        <div class="audio-card" aria-live="polite">
+          <h2>🔊 LISTEN & LEARN</h2>
+          <p class="instruction" style="font-size:18px">Need help listening? Press the buttons to hear the instruction and shape characteristics.</p>
+          <div class="audio-controls">
+            <button id="readLabBtn">🔊 READ THIS PAGE</button>
+            <button id="readFeaturesBtn">🗣️ READ SHAPE FEATURES</button>
+            <button id="stopAudioBtn">⏹️ STOP VOICE</button>
+            <button id="musicToggleBtn">🎵 MUSIC: OFF</button>
+          </div>
+          <div class="audio-status" id="audioStatus">Voice support is ready.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="realScreen" data-step="4">
+      <div class="panel">
+        <div class="quick-nav" aria-label="Choose where to go">
+          <button class="home-nav" data-nav="home">🏠 HOME</button>
+          <button data-shape-nav="0">⬛ SQUARE</button>
+          <button data-shape-nav="1">▭ RECTANGLE</button>
+          <button data-shape-nav="2">🔺 TRIANGLE</button>
+          <button data-shape-nav="3">⚪ CIRCLE</button>
+          <button class="quiz-nav active" data-nav="quiz">🧠 QUIZ</button>
+        </div>
+        <h1 class="screen-title">Shapes Around Us</h1>
+        <p class="instruction">Can you find shapes in the real world?</p>
+        <div class="real-scene" id="realScene"></div>
+        <div class="question" id="questionText"></div>
+        <div class="answers" id="answers"></div>
+        <div class="real-feedback" id="realFeedback"></div>
+        <div class="question-count" id="questionCount"></div>
+        <div class="nav-row"><button class="primary-btn hidden" id="nextQuestionBtn">NEXT →</button></div>
+      </div>
+    </section>
+
+    <section class="screen" id="finishScreen" data-step="6">
+      <div class="panel finish-panel">
+        <div class="quick-nav" aria-label="Choose where to go">
+          <button class="home-nav" data-nav="home">🏠 HOME</button>
+          <button data-shape-nav="0">⬛ SQUARE</button>
+          <button data-shape-nav="1">▭ RECTANGLE</button>
+          <button data-shape-nav="2">🔺 TRIANGLE</button>
+          <button data-shape-nav="3">⚪ CIRCLE</button>
+          <button class="lab-nav" data-nav="lab">🧪 SHAPE LAB</button>
+          <button class="quiz-nav" data-nav="quiz">🧠 QUIZ</button>
+        </div>
+        <span class="star a">⭐</span><span class="star b">✨</span><span class="star c">⭐</span>
+        <h1 class="screen-title">🎉 WELL DONE!</h1>
+        <p class="subtitle">You are a Shape Explorer!</p>
+        <div class="badge">🏆 SHAPE EXPLORER</div>
+        <div class="score-card" id="finishScore">YOUR SCORE: 0 / 5</div>
+        <div id="wrongReview" class="wrong-review"></div>
+        <div class="certificate-builder" id="certificateBuilder">
+          <h2>🏅 You completed Shape World!</h2>
+          <p>Enter your name to create your certificate.</p>
+          <div class="certificate-controls">
+            <input id="studentName" type="text" maxlength="40" placeholder="Enter your name" aria-label="Student name">
+            <button class="primary-btn" id="generateCertificateBtn">🎓 GET MY CERTIFICATE</button>
+            <button class="secondary-btn hidden" id="printCertificateBtn">🖨️ PRINT / SAVE PDF</button>
+            <button class="secondary-btn hidden" id="backFromCertificateBtn">⬅️ BACK TO HOME</button>
+          </div>
+          <div class="certificate hidden" id="certificateCard" aria-live="polite">
+            <div class="certificate-kicker">🌟 SHAPE WORLD LEARNING ADVENTURE 🌟</div>
+            <h2>CERTIFICATE OF COMPLETION</h2>
+            <div class="certificate-name" id="certificateName">Shape Explorer</div>
+            <div class="certificate-text">This certificate is proudly presented for successfully completing the Shape World module and completing the Shapes Around Us quiz.</div>
+            <div class="certificate-score" id="certificateScore">QUIZ SCORE: 0 / 10</div>
+            <div class="certificate-text">🏆 Achievement: <b>SHAPE EXPLORER</b><br>Recognised for learning about square, rectangle, triangle and circle characteristics.</div>
+            <div class="certificate-footer"><span id="certificateDate"></span><span>Shape World</span></div>
+          </div>
+        </div>
+        <h3>⭐ Shapes you learned:</h3>
+        <div class="learned"><span>⬛ Square</span><span>▭ Rectangle</span><span>🔺 Triangle</span><span>⚪ Circle</span></div>
+        <p style="font-size:20px;font-weight:900">You can identify shapes by their sides and corners!</p>
+        <div class="nav-row">
+          <button class="primary-btn hidden" id="retryQuizBtn">🔁 RETRY WRONG ANSWERS</button>
+          <button class="primary-btn" id="playAgainBtn">PLAY AGAIN</button>
+          <button class="secondary-btn" id="backStartBtn">BACK TO START</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+</div>
+
+<script>
+"use strict";
+
+const state = {
+  sound: true,
+  currentShapeIndex: 0,
+  shapePhase: "sides",
+  selectedSides: new Set(),
+  selectedCorners: new Set(),
+  realIndex: 0,
+  realCorrect: 0,
+  realWrong: [],
+  retryMode: false,
+  retryIndex: 0,
+  retryCorrect: 0,
+  answered: false,
+  completed: false,
+  labRotation: 0,
+  labScale: 1,
+  sameChosen: new Set(),
+  labAutoRead: true,
+  music: false,
+  voiceEnabled: true,
+  studentName: ""
+};
+
+const shapes = [
+  {name:"SQUARE", sides:4, corners:4, sideLabel:"Straight sides / Sisi lurus", cornerLabel:"Corners / Bucu",
+   summary:["4 straight sides","4 corners"], kind:"square"},
+  {name:"RECTANGLE", sides:4, corners:4, sideLabel:"Straight sides / Sisi lurus", cornerLabel:"Corners / Bucu",
+   summary:["4 straight sides","4 corners"], kind:"rectangle",
+   compare:true},
+  {name:"TRIANGLE", sides:3, corners:3, sideLabel:"Straight sides / Sisi lurus", cornerLabel:"Corners / Bucu",
+   summary:["3 straight sides","3 corners"], kind:"triangle"},
+  {name:"CIRCLE", sides:0, corners:0, sideLabel:"Curved side / Sisi melengkung", cornerLabel:"Corners / Bucu",
+   summary:["0 straight sides","1 curved side","0 corners"], kind:"circle"}
+];
+
+const questions = [
+  {object:"clock", question:"What shape is the clock?", answer:"CIRCLE", why:"The clock is round and has one continuous curved side with no corners, so it is a circle."},
+  {object:"window", question:"What shape is the window?", answer:"RECTANGLE", why:"The window has 4 straight sides, and its opposite sides are the same length, so it is a rectangle."},
+  {object:"sign", question:"What shape is the warning sign?", answer:"TRIANGLE", why:"The warning sign has 3 straight sides and 3 corners, so it is a triangle."},
+  {object:"frame", question:"What shape is the picture frame?", answer:"SQUARE", why:"The picture frame has 4 equal sides and 4 corners, so it is a square."},
+  {object:"book", question:"What shape is the book?", answer:"RECTANGLE", why:"The book has 4 straight sides, with opposite sides the same length, so it is a rectangle."},
+  {object:"rotatedSquare", question:"A square is turned. What shape is it now?", answer:"SQUARE", why:"Turning a square changes its position, not its shape. It is still a square."},
+  {object:"triangle", question:"Which shape has 3 corners?", answer:"TRIANGLE", why:"A triangle has exactly 3 corners and 3 straight sides."},
+  {object:"circle", question:"Which shape has 0 corners?", answer:"CIRCLE", why:"A circle has no corners because its edge is curved."},
+  {object:"square", question:"Which shape has 4 equal sides?", answer:"SQUARE", why:"A square has 4 straight sides and all 4 sides are the same length."},
+  {object:"rectangle", question:"Which shape has opposite sides that are the same length?", answer:"RECTANGLE", why:"A rectangle has 4 straight sides, with each pair of opposite sides the same length."}
+];
+
+const $ = id => document.getElementById(id);
+
+function beep(freq=600, duration=.08, type="sine", volume=.075, delay=0){
+  if(!state.sound) return;
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    if(!beep.ctx) beep.ctx = new AC();
+    const ctx = beep.ctx;
+    const t = ctx.currentTime + delay;
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = type; osc.frequency.setValueAtTime(freq,t);
+    gain.gain.setValueAtTime(0.0001,t);
+    gain.gain.exponentialRampToValueAtTime(volume,t+.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001,t+duration);
+    osc.connect(gain); gain.connect(ctx.destination); osc.start(t); osc.stop(t+duration+.02);
+  }catch(e){}
+}
+function speak(text){
+  if(!state.sound || !state.voiceEnabled || !('speechSynthesis' in window)) {
+    if($('audioStatus')) $('audioStatus').textContent = 'Voice is not available in this browser. You can still use the visual controls.';
+    return;
+  }
+  const myGeneration=++voiceGeneration;
+  window.speechSynthesis.cancel();
+  const musicWasOn=state.music;
+  if(musicWasOn && musicTimer){clearInterval(musicTimer);musicTimer=null;}
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='en-US';
+  u.rate=.86;
+  u.pitch=1.05;
+  u.volume=.95;
+  u.onstart=()=>{
+    if(myGeneration!==voiceGeneration)return;
+    if($('audioStatus')) $('audioStatus').textContent='🔊 Voice is speaking...';
+  };
+  u.onend=()=>{
+    if(myGeneration!==voiceGeneration)return;
+    if($('audioStatus')) $('audioStatus').textContent='✅ Voice finished.';
+    if(musicWasOn && state.music && !musicTimer) startMusic();
+  };
+  u.onerror=()=>{
+    if(myGeneration!==voiceGeneration)return;
+    if($('audioStatus')) $('audioStatus').textContent='⏹️ Voice stopped.';
+    if(musicWasOn && state.music && !musicTimer) startMusic();
+  };
+  window.speechSynthesis.speak(u);
+}
+function stopVoice(){
+  // STOP VOICE only controls narration. It must NEVER mute button sounds,
+  // correct/wrong effects, or background music.
+  voiceGeneration++;
+  state.voiceEnabled=false;
+  if('speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+    setTimeout(()=>window.speechSynthesis.cancel(),0);
+  }
+  if($('audioStatus')) $('audioStatus').textContent='⏹️ Voice stopped. Sounds and music are still on.';
+  if(state.music && !musicTimer) startMusic();
+}
+function labSpeech(){
+  const s=shapes[state.currentShapeIndex];
+  const sides=s.kind==='circle'?'zero straight sides and one curved side':`${s.sides} straight sides`;
+  const corners=s.corners===0?'zero corners':`${s.corners} corners`;
+  return `This is a ${s.name.toLowerCase()}. It has ${sides} and ${corners}. Turning the shape does not change its name. Changing its size does not change its name.`;
+}
+
+function startSound(){if(!state.sound)return;beep(523,.08,"sine",.09);beep(659,.08,"sine",.09, .08);beep(784,.13,"sine",.10,.16)}
+function yesNoClickSound(value){if(!state.sound)return; if(value){beep(520,.055,"sine",.085);beep(620,.055,"sine",.08,.055);}else{beep(360,.06,"sine",.085);beep(300,.06,"sine",.08,.06);}}
+function successSound(){if(!state.sound)return;beep(659,.09,"triangle",.13);beep(784,.10,"triangle",.13,.09);beep(1047,.16,"triangle",.15,.20)}
+function celebrationSound(){if(!state.sound)return;[523,659,784,1047].forEach((f,i)=>beep(f,.11,"triangle",.10,i*.09))}
+function errorSound(){if(!state.sound)return;beep(220,.16,"sawtooth",.11);beep(165,.20,"sawtooth",.10,.16)}
+let lastPopAt=0;
+function popSound(){
+  if(!state.sound)return;
+  const now=Date.now();
+  if(now-lastPopAt<80)return;
+  lastPopAt=now;
+  beep(720,.055,"sine",.075);
+}
+function cornerSound(){if(!state.sound)return;beep(880,.07,"triangle",.075);beep(1040,.07,"triangle",.07,.06)}
+
+// Gentle original background melody made with Web Audio. No external audio files are needed.
+let musicTimer=null, musicStep=0;
+let voiceGeneration=0;
+const musicNotes=[
+  [523,0.22],[659,0.22],[784,0.28],[659,0.22],
+  [587,0.22],[698,0.22],[880,0.28],[698,0.22],
+  [523,0.22],[659,0.22],[784,0.28],[1047,0.32],
+  [784,0.22],[698,0.22],[659,0.28],[523,0.32]
+];
+function musicTone(freq,duration){
+  if(!state.sound || !state.music) return;
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    if(!beep.ctx) beep.ctx=new AC();
+    const ctx=beep.ctx;
+    if(ctx.state==='suspended') ctx.resume();
+    const t=ctx.currentTime, osc=ctx.createOscillator(), gain=ctx.createGain();
+    osc.type='sine';osc.frequency.setValueAtTime(freq,t);
+    gain.gain.setValueAtTime(0.0001,t);
+    gain.gain.linearRampToValueAtTime(0.16,t+0.035);
+    gain.gain.linearRampToValueAtTime(0.0001,t+duration);
+    osc.connect(gain);gain.connect(ctx.destination);osc.start(t);osc.stop(t+duration+0.03);
+  }catch(e){}
+}
+function startMusic(){
+  if(musicTimer)return;
+  state.music=true;
+  musicStep=0;
+  const play=()=>{
+    if(!state.music)return;
+    const [freq,dur]=musicNotes[musicStep%musicNotes.length];
+    musicTone(freq,dur);musicStep++;
+  };
+  play();
+  musicTimer=setInterval(play,280);
+  if($('musicToggleBtn'))$('musicToggleBtn').textContent='🎵 MUSIC: ON';
+}
+function stopMusic(){
+  state.music=false;
+  if(musicTimer){clearInterval(musicTimer);musicTimer=null;}
+  if($('musicToggleBtn'))$('musicToggleBtn').textContent='🎵 MUSIC: OFF';
+}
+function toggleMusic(){
+  if(state.music)stopMusic();else startMusic();
+}
+
+function setScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $(id).classList.add("active");
+  updateProgress(id);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function updateProgress(id){
+  const map={coverScreen:1,learnScreen:2,shapeScreen:3,labScreen:4,realScreen:5,finishScreen:6};
+  const step=map[id]||1;
+  $("progressText").textContent = step+" / 6";
+  $("dots").innerHTML="";
+  for(let i=1;i<=6;i++){
+    const d=document.createElement("span");d.className="dot "+(i<step?"done":i===step?"current":"");$("dots").appendChild(d);
+  }
+}
+
+function resetShape(){
+  state.shapePhase="sides";state.selectedSides.clear();state.selectedCorners.clear();
+  $("nextShapeBtn").classList.add("hidden");$("summary").classList.remove("show");$("summary").innerHTML="";
+  renderShape();
+}
+function openShape(index){
+  state.currentShapeIndex=index;resetShape();setScreen("shapeScreen");
+  if(state.sound && state.voiceEnabled) setTimeout(()=>{
+    const s=shapes[index];
+    const instruction=s.kind==='circle'?'Tap the curved side. Then we will check the corners.':`Tap all ${s.sides} straight sides. Then tap all ${s.corners} corners.`;
+    speak(`Let’s learn about the ${s.name.toLowerCase()}. ${instruction}`);
+  },180);
+}
+function renderShape(){
+  const s=shapes[state.currentShapeIndex];
+  $("shapeTitle").textContent=s.name;
+  $("shapeInstruction").textContent = state.shapePhase==="sides"
+    ? (s.kind==="circle" ? "Tap the curved side." : "Tap every straight side.")
+    : (state.shapePhase==="corners" ? "Now tap every corner." : "Can you find a corner?");
+  const board=$("shapeBoard");
+  board.innerHTML="";
+  const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox","0 0 500 380");svg.classList.add("shape-svg");
+  if(s.kind==="square"){
+    drawPolygon(svg,[[130,60],[370,60],[370,300],[130,300]],true);
+  }else if(s.kind==="rectangle"){
+    drawPolygon(svg,[[90,100],[410,100],[410,280],[90,280]],true);
+  }else if(s.kind==="triangle"){
+    drawPolygon(svg,[[250,45],[410,310],[90,310]],true);
+  }else{
+    const c=document.createElementNS(svg.namespaceURI,"circle");c.setAttribute("cx","250");c.setAttribute("cy","190");c.setAttribute("r","125");c.classList.add("circle-visible");svg.appendChild(c);
+    const hit=document.createElementNS(svg.namespaceURI,"circle");hit.setAttribute("cx","250");hit.setAttribute("cy","190");hit.setAttribute("r","125");hit.classList.add("circle-hit");
+    hit.setAttribute("tabindex","0");hit.setAttribute("role","button");hit.setAttribute("aria-label","Curved side");
+    hit.addEventListener("click",()=>selectSide(0,hit));
+    hit.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectSide(0,hit)}});svg.appendChild(hit);
+    for(let i=0;i<3;i++){
+      const hint=document.createElementNS(svg.namespaceURI,"circle");hint.setAttribute("cx",250);hint.setAttribute("cy",190);hint.setAttribute("r",i===0?38:0);
+    }
+    board.appendChild(svg);
+    $("counter").textContent="Curved sides: "+state.selectedSides.size;
+    $("shapeFeedback").textContent="Tap the edge of the circle. 👆";
+    return;
+  }
+  board.appendChild(svg);
+  updateShapeCounter();
+}
+function drawPolygon(svg,pts){
+  const ns=svg.namespaceURI;
+  const poly=document.createElementNS(ns,"polygon");poly.setAttribute("points",pts.map(p=>p.join(",")).join(" "));poly.classList.add("visible-shape");svg.appendChild(poly);
+  for(let i=0;i<pts.length;i++){
+    const a=pts[i],b=pts[(i+1)%pts.length];
+    const line=document.createElementNS(ns,"line");line.setAttribute("x1",a[0]);line.setAttribute("y1",a[1]);line.setAttribute("x2",b[0]);line.setAttribute("y2",b[1]);line.classList.add("side-visible");line.dataset.side=i;svg.appendChild(line);
+    const hit=document.createElementNS(ns,"line");hit.setAttribute("x1",a[0]);hit.setAttribute("y1",a[1]);hit.setAttribute("x2",b[0]);hit.setAttribute("y2",b[1]);hit.classList.add("side-hit");hit.dataset.side=i;hit.setAttribute("tabindex","0");hit.setAttribute("role","button");hit.setAttribute("aria-label","Straight side "+(i+1));
+    hit.addEventListener("click",()=>selectSide(i,hit));hit.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectSide(i,hit)}});svg.appendChild(hit);
+  }
+  pts.forEach((p,i)=>{
+    const c=document.createElementNS(ns,"circle");c.setAttribute("cx",p[0]);c.setAttribute("cy",p[1]);c.setAttribute("r",24);c.classList.add("corner-hit");c.dataset.corner=i;c.setAttribute("tabindex","0");c.setAttribute("role","button");c.setAttribute("aria-label","Corner "+(i+1));
+    c.addEventListener("click",()=>selectCorner(i,c));c.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectCorner(i,c)}});svg.appendChild(c);
+  });
+}
+function selectSide(i,el){
+  const s=shapes[state.currentShapeIndex];
+  if(state.shapePhase!=="sides" || state.selectedSides.has(i)) return;
+  state.selectedSides.add(i);el.classList.add("selected");
+  const visible=el.previousElementSibling;
+  if(visible && visible.classList.contains("side-visible")) visible.classList.add("selected");
+  popSound();updateShapeCounter();
+  if(state.selectedSides.size===s.sides){
+     successSound();
+     if(s.kind==="circle"){
+       $("shapeFeedback").textContent="🎉 You found the curved side! Now look carefully for a corner.";
+       $("shapeInstruction").textContent="Can you find a corner?";
+       setTimeout(()=>{
+         state.shapePhase="circleCornerCheck";
+         $("shapeFeedback").textContent="Tap inside the circle to check. 👆";
+       },850);
+     }else{
+       $("shapeFeedback").textContent="🎉 You found all "+s.sides+" straight sides!";
+       setTimeout(()=>{
+         state.shapePhase="corners";renderShape();
+         $("shapeFeedback").textContent="Now tap every corner. 👆";
+       },850);
+     }
+  }
+}
+function selectCorner(i,el){
+  const s=shapes[state.currentShapeIndex];
+  if(state.shapePhase!=="corners" || state.selectedCorners.has(i)) return;
+  state.selectedCorners.add(i);el.classList.add("selected");cornerSound();updateShapeCounter();
+  if(state.selectedCorners.size===s.corners){
+    successSound();showSummary();
+  }
+}
+function updateShapeCounter(){
+  const s=shapes[state.currentShapeIndex];
+  if(state.shapePhase==="sides"){
+    $("counter").textContent=s.kind==="circle"?"Curved sides: "+state.selectedSides.size:"Straight sides: "+state.selectedSides.size;
+  }else{
+    $("counter").textContent="Corners: "+state.selectedCorners.size;
+  }
+}
+function showSummary(){
+  const s=shapes[state.currentShapeIndex];
+  $("shapeInstruction").textContent="You discovered it!";
+  $("shapeFeedback").textContent=s.kind==="circle"?"Great! There are no corners.":"Great! You found "+s.corners+" corners!";
+  const box=$("summary");box.innerHTML="";
+  const h=document.createElement("h2");h.textContent=s.name;box.appendChild(h);
+  s.summary.forEach(t=>{const li=document.createElement("div");li.textContent="• "+t;li.style.fontWeight="900";li.style.fontSize="18px";li.style.margin="6px 0";box.appendChild(li)});
+  const labels=document.createElement("div");labels.style.marginTop="10px";labels.style.fontWeight="800";
+  labels.textContent=(s.kind==="circle"?"Curved side / Sisi melengkung":"Straight sides / Sisi lurus")+"  •  "+s.cornerLabel;
+  box.appendChild(labels);box.classList.add("show");
+  if(s.compare){
+    const cmp=document.createElement("div");cmp.className="compare";
+    cmp.innerHTML="<b>Square vs Rectangle</b><div class='compare-grid'><div class='compare-item'><strong>⬛ Square</strong>All 4 sides are the same length.</div><div class='compare-item'><strong>▭ Rectangle</strong>Opposite sides are the same length.</div></div>";
+    box.appendChild(cmp);
+  }
+  $("nextShapeBtn").classList.remove("hidden");
+}
+function circleInsideFeedback(){
+  if(shapes[state.currentShapeIndex].kind!=="circle") return;
+  if(state.shapePhase==="sides" && state.selectedSides.size===0){
+    $("shapeFeedback").textContent="Look at the edge. Tap the curved side first!";
+    errorSound();
+    return;
+  }
+  if(state.shapePhase==="circleCornerCheck"){
+    errorSound();
+    $("shapeFeedback").textContent="Almost! Look at the edge. Does the circle have a corner?";
+    setTimeout(()=>showSummary(),700);
+  }
+}
+$("shapeBoard").addEventListener("click",e=>{
+  if(shapes[state.currentShapeIndex].kind==="circle" && !e.target.classList.contains("circle-hit")) circleInsideFeedback();
+});
+
+function realSceneSVG(type){
+  const common=`stroke="#25445c" stroke-width="6" stroke-linejoin="round"`;
+  if(type==="square" || type==="rotatedSquare") {
+    const transform=type==="rotatedSquare"?' transform="rotate(45 360 140)"':'';
+    return `<svg class="scene-svg" viewBox="0 0 720 300"><rect width="720" height="300" rx="20" fill="#fff0b8"/><rect x="270" y="50" width="180" height="180" rx="4" fill="#ffd95a" ${common}${transform}/></svg>`;
+  }
+  if(type==="rectangle") return `<svg class="scene-svg" viewBox="0 0 720 300"><rect width="720" height="300" rx="20" fill="#dff3ff"/><rect x="205" y="70" width="310" height="145" rx="8" fill="#9edcff" ${common}/></svg>`;
+  if(type==="triangle") return `<svg class="scene-svg" viewBox="0 0 720 300"><rect width="720" height="300" rx="20" fill="#e5f7df"/><polygon points="360,40 490,225 230,225" fill="#ff9f43" ${common}/></svg>`;
+  if(type==="circle") return `<svg class="scene-svg" viewBox="0 0 720 300"><rect width="720" height="300" rx="20" fill="#f0eaff"/><circle cx="360" cy="140" r="88" fill="#ffd95a" ${common}/></svg>`;
+  if(type==="clock") return `<svg class="scene-svg" viewBox="0 0 720 300"><rect width="720" height="300" rx="20" fill="#b9e8ff"/><rect y="235" width="720" height="65" fill="#79d68a"/><circle cx="360" cy="140" r="92" fill="#fff8df" ${common}/><line x1="360" y1="140" x2="360" y2="83" ${common}/><line x1="360" y1="140" x2="405" y2="165" ${common}/><circle cx="360" cy="140" r="8" fill="#ff9f43" ${common}/></svg>`;
+  if(type==="window") return `<svg class="scene-svg" viewBox="0 0 720 300"><rect width="720" height="300" rx="20" fill="#ffe9b0"/><rect x="170" y="45" width="380" height="190" rx="8" fill="#9edcff" ${common}/><line x1="360" y1="48" x2="360" y2="232" ${common}/><line x1="172" y1="140" x2="548" y2="140" ${common}/></svg>`;
+  if(type==="sign") return `<svg class="scene-svg" viewBox="0 0 720 300"><rect width="720" height="300" rx="20" fill="#c9efff"/><rect y="238" width="720" height="62" fill="#b9b9b9"/><polygon points="360,40 455,215 265,215" fill="#ff9f43" ${common}/><polygon points="360,75 420,190 300,190" fill="#fff8df" ${common}/></svg>`;
+  if(type==="frame") return `<svg class="scene-svg" viewBox="0 0 720 300"><rect width="720" height="300" rx="20" fill="#ffe7c9"/><rect x="255" y="35" width="210" height="210" rx="5" fill="#ffd95a" ${common}/><rect x="275" y="55" width="170" height="170" fill="#9edcff" ${common}/><circle cx="335" cy="112" r="25" fill="#ffcfad" ${common}/><path d="M290 200 Q350 135 410 200" fill="#79d68a" ${common}/></svg>`;
+  return `<svg class="scene-svg" viewBox="0 0 720 300"><rect width="720" height="300" rx="20" fill="#d8f2df"/><rect x="225" y="35" width="270" height="205" rx="10" fill="#ff9f43" ${common}/><rect x="245" y="55" width="230" height="165" rx="5" fill="#fff8df" ${common}/><line x1="265" y1="90" x2="455" y2="90" ${common}/><line x1="265" y1="120" x2="430" y2="120" ${common}/><line x1="265" y1="150" x2="445" y2="150" ${common}/></svg>`;
+}
+function loadQuestion(){
+  const qIndex=state.retryMode ? state.realWrong[state.retryIndex] : state.realIndex;
+  const q=questions[qIndex];
+  state.answered=false;
+  $("realScene").innerHTML=realSceneSVG(q.object);
+  $("questionText").textContent=q.question;
+  $("questionCount").textContent=state.retryMode ? `Retry ${state.retryIndex+1} of ${state.realWrong.length}` : `Question ${state.realIndex+1} of ${questions.length}`;
+  $("realFeedback").textContent="";
+  $("nextQuestionBtn").classList.add("hidden");
+  $("answers").innerHTML="";
+  if(state.sound && state.voiceEnabled){ const g=voiceGeneration; setTimeout(()=>{ if(g===voiceGeneration && state.sound && state.voiceEnabled) speak(`${q.question} Choose square, rectangle, triangle, or circle.`); },120); }
+  ["SQUARE","RECTANGLE","TRIANGLE","CIRCLE"].forEach(label=>{
+    const b=document.createElement("button");b.className="answer";b.textContent=label;b.setAttribute("aria-label",label);
+    b.addEventListener("click",()=>answerQuestion(label,b));$("answers").appendChild(b);
+  });
+}
+function answerQuestion(label,btn){
+  if(state.answered) return;
+  const qIndex=state.retryMode ? state.realWrong[state.retryIndex] : state.realIndex;
+  const q=questions[qIndex];
+  const ok=label===q.answer;
+  if(state.retryMode){
+    if(ok){
+      state.answered=true; state.retryCorrect++; btn.classList.add("correct"); successSound();
+      $("realFeedback").textContent=`🎉 Correct! ${q.why}`;
+      speak(`Correct! ${q.why}`);
+      $("nextQuestionBtn").textContent=state.retryIndex<state.realWrong.length-1?"NEXT →":"FINISH RETRY ✓";
+      $("nextQuestionBtn").classList.remove("hidden"); celebrate();
+    }else{
+      btn.classList.add("wrong"); errorSound();
+      $("realFeedback").textContent=`💡 Not yet. ${q.why} The correct answer is ${q.answer}. Try again!`;
+      speak(`Not quite. ${q.why} Try again.`);
+      setTimeout(()=>btn.classList.remove("wrong"),650);
+    }
+    return;
+  }
+  if(ok){
+    state.answered=true; state.realCorrect++; btn.classList.add("correct"); successSound();
+    $("realFeedback").textContent=`🎉 Correct! The ${q.object} is a ${q.answer.toLowerCase()}.`;
+    speak(`Correct! The ${q.object} is a ${q.answer.toLowerCase()}. Well done!`);
+    if(state.realIndex<questions.length-1){
+      setTimeout(nextReal,650);
+    }else{
+      setTimeout(finishLesson,700);
+    }
+  }else{
+    btn.classList.add("wrong"); errorSound();
+    if(!state.realWrong.includes(qIndex)) state.realWrong.push(qIndex);
+    $("realFeedback").textContent="❌ Wrong! Let’s move to the next question.";
+    speak("Wrong answer. Let’s move to the next question.");
+    setTimeout(()=>{
+      btn.classList.remove("wrong");
+      if(state.realIndex<questions.length-1){ state.realIndex++; loadQuestion(); }
+      else finishLesson();
+    },700);
+  }
+}
+function resetCertificateUI(){
+  $("studentName").value="";
+  $("certificateCard").classList.add("hidden");
+  $("printCertificateBtn").classList.add("hidden");
+  $("backFromCertificateBtn").classList.add("hidden");
+  $("certificateBuilder").querySelector("p").textContent="Enter your name to create your certificate.";
+}
+
+function startRealWorld(){
+  resetCertificateUI();
+  state.realIndex=0;state.realCorrect=0;state.realWrong=[];state.retryMode=false;state.retryIndex=0;state.retryCorrect=0;
+  loadQuestion();setScreen("realScreen");
+}
+function nextReal(){
+  if(!state.answered)return;
+  if(state.retryMode){
+    if(state.retryIndex<state.realWrong.length-1){state.retryIndex++;loadQuestion();}
+    else finishRetry();
+    return;
+  }
+  if(state.realIndex<questions.length-1){state.realIndex++;loadQuestion();}
+  else finishLesson();
+}
+function finishLesson(){
+  state.completed=true;localStorage.setItem("shapeWorldCompleted","true");
+  celebrationSound();celebrate();setScreen("finishScreen");
+  const score=state.realCorrect+" / "+questions.length;
+  $("finishScore").textContent=`YOUR SCORE: ${score}`;
+  renderWrongReview();
+  speak(`Well done, Shape Explorer! Your score is ${state.realCorrect} out of ${questions.length}.`);
+}
+function renderWrongReview(){
+  const box=$("wrongReview");
+  box.innerHTML="";
+  if(state.realWrong.length===0){
+    box.innerHTML='<div class="perfect-review">🌟 Perfect! You answered every question correctly.</div>';
+    $("retryQuizBtn").classList.add("hidden");
+    return;
+  }
+  const title=document.createElement("h3");title.textContent="📖 LET’S LEARN FROM THE MISTAKES";box.appendChild(title);
+  state.realWrong.forEach((idx,n)=>{
+    const q=questions[idx]; const item=document.createElement("div");item.className="wrong-review-item";
+    item.innerHTML=`<strong>Question ${idx+1}: ${q.question}</strong><div>❌ Your first answer was wrong.</div><div>✅ Correct answer: <b>${q.answer}</b></div><div>💡 Why? ${q.why}</div>`;
+    box.appendChild(item);
+  });
+  $("retryQuizBtn").classList.remove("hidden");
+}
+function startRetry(){
+  if(!state.realWrong.length)return;
+  state.retryMode=true;state.retryIndex=0;state.retryCorrect=0;state.answered=false;
+  loadQuestion();setScreen("realScreen");
+  if(state.sound && state.voiceEnabled) setTimeout(()=>speak("Let’s retry the questions you missed. Take your time and try again."),150);
+}
+function finishRetry(){
+  const totalRetry=state.realWrong.length;
+  state.retryMode=false;
+  const corrected=state.retryCorrect;
+  state.realWrong=[];
+  $("finishScore").textContent=`RETRY COMPLETE: ${corrected} / ${totalRetry} CORRECT`;
+  renderWrongReview();
+  $("wrongReview").insertAdjacentHTML("afterbegin",'<div class="retry-success">🎉 Great work! You corrected the questions you missed.</div>');
+  setScreen("finishScreen");
+  speak(`Retry complete. You corrected ${corrected} of ${totalRetry} questions.`);
+}
+function generateCertificate(){
+  const name=$("studentName").value.trim();
+  if(!name){
+    $("studentName").focus();
+    $("certificateBuilder").querySelector("p").textContent="Please enter your name first!";
+    errorSound();
+    return;
+  }
+  state.studentName=name;
+  $("certificateName").textContent=name;
+  $("certificateScore").textContent=`QUIZ SCORE: ${state.realCorrect} / ${questions.length}`;
+  $("certificateDate").textContent=new Intl.DateTimeFormat(undefined,{year:"numeric",month:"long",day:"numeric"}).format(new Date());
+  $("certificateCard").classList.remove("hidden");
+  $("printCertificateBtn").classList.remove("hidden");
+  $("backFromCertificateBtn").classList.remove("hidden");
+  $("certificateBuilder").querySelector("p").textContent="Your certificate is ready! You can print it or save it as a PDF.";
+  successSound();
+  speak(`Congratulations ${name}! Your Shape World certificate is ready.`);
+  setTimeout(()=>$("certificateCard").scrollIntoView({behavior:"smooth",block:"center"}),80);
+}
+
+function printCertificate(){
+  if(!state.studentName){
+    errorSound();
+    return;
+  }
+  // Stop only narration while preparing the print; SFX/music remain available.
+  try{ speechSynthesis.cancel(); }catch(e){}
+  document.body.classList.add("certificate-print-mode");
+  const oldTitle=document.title;
+  document.title="Shape World Certificate - "+state.studentName;
+  const cleanup=()=>{
+    document.body.classList.remove("certificate-print-mode");
+    document.title=oldTitle;
+    window.removeEventListener("afterprint",cleanup);
+  };
+  window.addEventListener("afterprint",cleanup);
+  // Give the browser one paint cycle so the print layout is fully applied.
+  requestAnimationFrame(()=>setTimeout(()=>window.print(),120));
+}
+
+function celebrate(){
+  const box=$("confetti");box.innerHTML="";
+  for(let i=0;i<24;i++){
+    const x=document.createElement("i");x.style.left=(Math.random()*100)+"%";x.style.top=(-10-Math.random()*20)+"%";
+    x.style.background=["#ffd95a","#ff9f43","#79d68a","#9edcff","#ff8fa3"][i%5];
+    x.style.animationDelay=(Math.random()*.3)+"s";box.appendChild(x);
+  }
+  box.classList.add("show");setTimeout(()=>box.classList.remove("show"),1700);
+}
+function labShapeSVG(kind, rotation=0, scale=1){
+  const ns="http://www.w3.org/2000/svg";
+  const svg=document.createElementNS(ns,"svg");
+  svg.setAttribute("viewBox","0 0 360 280");
+  let el;
+  if(kind==="square"){el=document.createElementNS(ns,"rect");el.setAttribute("x","95");el.setAttribute("y","45");el.setAttribute("width","170");el.setAttribute("height","170");}
+  else if(kind==="rectangle"){el=document.createElementNS(ns,"rect");el.setAttribute("x","55");el.setAttribute("y","75");el.setAttribute("width","250");el.setAttribute("height","120");}
+  else if(kind==="triangle"){el=document.createElementNS(ns,"polygon");el.setAttribute("points","180,35 295,215 65,215");}
+  else {el=document.createElementNS(ns,"circle");el.setAttribute("cx","180");el.setAttribute("cy","140");el.setAttribute("r","85");el.classList.add("circle");}
+  el.classList.add("lab-shape");
+  el.style.transform=`rotate(${rotation}deg) scale(${scale})`;
+  svg.appendChild(el);
+  return svg;
+}
+function renderLab(){
+  const s=shapes[state.currentShapeIndex];
+  const kind=s.kind;
+  const stage=$("labStage");stage.innerHTML="";
+  const svg=labShapeSVG(kind,state.labRotation,state.labScale);
+  svg.setAttribute('role','img');
+  svg.setAttribute('aria-label',`${s.name.toLowerCase()} shape, rotated ${state.labRotation} degrees, size ${state.labScale===1?'normal':'large'}`);
+  stage.appendChild(svg);
+  $("labSides").textContent=s.kind==="circle"?"0":s.sides;
+  $("labCorners").textContent=s.corners;
+  $("labName").textContent=s.name;
+  document.querySelectorAll('[data-lab-shape]').forEach(b=>b.classList.toggle('active',Number(b.dataset.labShape)===state.currentShapeIndex));
+}
+function resetLabQuestions(){
+  const s=shapes[state.currentShapeIndex];
+  const name=s.name.toLowerCase();
+
+  // Each shape gets DIFFERENT questions for each experiment.
+  // The questions are deliberately tied to the selected shape.
+  const q={
+    square:{
+      rotate:{text:"After turning the square, how many corners does it still have?",type:"number",answer:4,good:"🎉 Correct! A turned square still has 4 corners.",bad:"💡 A square still has 4 corners even when it is turned."},
+      resize:{text:"If the square becomes bigger, does it still have 4 equal sides?",type:"yesno",answer:true,good:"🎉 Correct! A bigger square still has 4 equal sides.",bad:"💡 Making a square bigger does not change its equal sides."},
+      inspect:{text:"Which feature helps us identify a square?",type:"choice",options:["4 equal sides","3 corners","1 curved side"],answer:"4 equal sides",good:"🎉 Correct! A square has 4 equal sides.",bad:"💡 A square is identified by its 4 equal sides and 4 corners."}
+    },
+    rectangle:{
+      rotate:{text:"If we turn the rectangle, is it still a rectangle?",type:"yesno",answer:true,good:"🎉 Correct! Turning a rectangle does not change its shape.",bad:"💡 A turned rectangle is still a rectangle."},
+      resize:{text:"If the rectangle becomes bigger, do opposite sides still have the same length?",type:"yesno",answer:true,good:"🎉 Correct! Opposite sides are still the same length.",bad:"💡 Changing size does not remove the rectangle's equal opposite sides."},
+      inspect:{text:"How many straight sides does a rectangle have?",type:"number",answer:4,good:"🎉 Correct! A rectangle has 4 straight sides.",bad:"💡 A rectangle has 4 straight sides."}
+    },
+    triangle:{
+      rotate:{text:"After turning the triangle, how many corners does it still have?",type:"number",answer:3,good:"🎉 Correct! A turned triangle still has 3 corners.",bad:"💡 Turning the triangle does not change its 3 corners."},
+      resize:{text:"If the triangle becomes bigger, does it still have 3 sides?",type:"yesno",answer:true,good:"🎉 Correct! A bigger triangle still has 3 sides.",bad:"💡 Making a triangle bigger does not add or remove sides."},
+      inspect:{text:"Which statement is true about this triangle?",type:"choice",options:["It has 3 straight sides","It has 4 corners","It has 1 curved side"],answer:"It has 3 straight sides",good:"🎉 Correct! A triangle has 3 straight sides.",bad:"💡 A triangle has 3 straight sides and 3 corners."}
+    },
+    circle:{
+      rotate:{text:"If we turn the circle, is it still a circle?",type:"yesno",answer:true,good:"🎉 Correct! A circle is still a circle when it is turned.",bad:"💡 Turning a circle does not change its shape."},
+      resize:{text:"If the circle becomes bigger, does it still have 0 corners?",type:"yesno",answer:true,good:"🎉 Correct! A bigger circle still has 0 corners.",bad:"💡 Changing the size of a circle does not create corners."},
+      inspect:{text:"How many curved sides does a circle have?",type:"number",answer:1,good:"🎉 Correct! A circle has 1 continuous curved side.",bad:"💡 A circle has 1 continuous curved side and 0 corners."}
+    }
+  }[s.kind];
+
+  const sections=[
+    {key:"rotate",container:"rotateAnswers",feedback:"rotateFeedback"},
+    {key:"resize",container:"resizeAnswers",feedback:"resizeFeedback"},
+    {key:"inspect",container:"inspectAnswers",feedback:"inspectFeedback"}
+  ];
+
+  sections.forEach(sec=>{
+    const data=q[sec.key];
+    $(sec.feedback).textContent="";
+    $(sec.container).innerHTML="";
+    $(`${sec.key}Question`).textContent=data.text;
+
+    if(data.type==="yesno"){
+      [true,false].forEach(value=>{
+        const btn=document.createElement("button");
+        btn.className="lab-answer";
+        btn.textContent=value?"✓ YES":"✕ NO";
+        btn.setAttribute("aria-label",`${value?"Yes":"No"} answer`);
+        btn.addEventListener("click",()=>{
+          if($(sec.container).querySelector("button:disabled")) return;
+          $(sec.container).querySelectorAll("button").forEach(b=>b.disabled=true);
+          const ok=value===data.answer;
+          btn.classList.add(ok?"correct":"wrong");
+          yesNoClickSound(value);
+          $(sec.feedback).textContent=ok?data.good:data.bad;
+          if(ok){successSound();speak(data.good.replace("🎉 ",""));}
+          else{errorSound();speak(data.bad.replace("💡 ",""));}
+        });
+        $(sec.container).appendChild(btn);
+      });
+    } else if(data.type==="number"){
+      const values=[data.answer-1,data.answer,data.answer+1].filter(v=>v>=0);
+      [...new Set(values)].forEach(value=>{
+        const btn=document.createElement("button");
+        btn.className="lab-answer";btn.textContent=String(value);
+        btn.setAttribute("aria-label",`${value}`);
+        btn.addEventListener("click",()=>{
+          if($(sec.container).querySelector("button:disabled")) return;
+          $(sec.container).querySelectorAll("button").forEach(b=>b.disabled=true);
+          const ok=value===data.answer;
+          btn.classList.add(ok?"correct":"wrong");
+          if(ok){successSound();$(sec.feedback).textContent=data.good;speak(data.good.replace("🎉 ",""));}
+          else{errorSound();$(sec.feedback).textContent=data.bad;speak(data.bad.replace("💡 ",""));}
+        });
+        $(sec.container).appendChild(btn);
+      });
+    } else {
+      data.options.forEach(option=>{
+        const btn=document.createElement("button");
+        btn.className="lab-answer";btn.textContent=option;
+        btn.addEventListener("click",()=>{
+          if($(sec.container).querySelector("button:disabled")) return;
+          $(sec.container).querySelectorAll("button").forEach(b=>b.disabled=true);
+          const ok=option===data.answer;
+          btn.classList.add(ok?"correct":"wrong");
+          if(ok){successSound();$(sec.feedback).textContent=data.good;speak(data.good.replace("🎉 ",""));}
+          else{errorSound();$(sec.feedback).textContent=data.bad;speak(data.bad.replace("💡 ",""));}
+        });
+        $(sec.container).appendChild(btn);
+      });
+    }
+  });
+}
+function openLab(){
+  state.labRotation=0;state.labScale=1;
+  renderLab();resetLabQuestions();
+  $("labMessage").textContent="Try turning the shape. What do you notice?";
+
+  setScreen("labScreen");
+  if(state.sound && state.voiceEnabled && state.labAutoRead){ const g=voiceGeneration; setTimeout(()=>{ if(g===voiceGeneration && state.sound && state.voiceEnabled) speak(`Welcome to Shape Lab. You are experimenting with a ${shapes[state.currentShapeIndex].name.toLowerCase()}. Choose a shape, rotate it, change its size, or inspect its features.`); },250); }
+}
+
+function fullReset(){
+  state.currentShapeIndex=0;state.shapePhase="sides";state.selectedSides.clear();state.selectedCorners.clear();
+  state.realIndex=0;state.realCorrect=0;state.realWrong=[];state.retryMode=false;state.retryIndex=0;state.retryCorrect=0;state.answered=false;state.completed=false;state.labRotation=0;state.labScale=1;state.studentName="";
+  setScreen("coverScreen");
+}
+
+document.querySelectorAll('[data-lab-shape]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    state.currentShapeIndex=Number(btn.dataset.labShape);
+    state.labRotation=0;state.labScale=1;
+    renderLab();resetLabQuestions();
+    const s=shapes[state.currentShapeIndex];
+    $("labMessage").textContent=`Now experimenting with ${s.name.toLowerCase()}. Try rotating it!`;
+  
+    popSound();
+    speak(`You chose ${s.name.toLowerCase()}. ${labSpeech()}`);
+  });
+});
+
+$("readLabBtn").addEventListener('click',()=>speak(`Shape Lab. ${labSpeech()} Press rotate to turn the shape. Press change size to make it bigger or smaller. Press inspect to hear the features.`));
+$("readFeaturesBtn").addEventListener('click',()=>speak(labSpeech()));
+$("stopAudioBtn").addEventListener('click',()=>{
+  if(state.voiceEnabled){
+    stopVoice();
+    $("stopAudioBtn").textContent='🔊 TURN VOICE ON';
+    $("stopAudioBtn").setAttribute('aria-label','Turn voice on');
+  }else{
+    voiceGeneration++;
+    state.voiceEnabled=true;
+    $("stopAudioBtn").textContent='⏹️ STOP VOICE';
+    $("stopAudioBtn").setAttribute('aria-label','Stop voice');
+    if($("audioStatus")) $("audioStatus").textContent='🔊 Voice is on.';
+    speak('Voice is on again.');
+  }
+});
+$("musicToggleBtn").addEventListener('click',()=>{toggleMusic();popSound();});
+
+$("labRotateBtn").addEventListener("click",()=>{
+  state.labRotation=(state.labRotation+45)%360;renderLab();popSound();
+  $("labMessage").textContent="👀 It turned, but the features stayed the same. It is still a "+shapes[state.currentShapeIndex].name+"!";
+  speak(`You turned the shape. It is still a ${shapes[state.currentShapeIndex].name.toLowerCase()}. Turning changes its position, not its shape.`);
+});
+$("labResetBtn").addEventListener("click",()=>{state.labRotation=0;state.labScale=1;renderLab();popSound();$("labMessage").textContent="Back to the original position. The shape is unchanged.";speak(`The shape is back to its original position. It is still a ${shapes[state.currentShapeIndex].name.toLowerCase()}.`);});
+$("labResizeBtn").addEventListener("click",()=>{state.labScale=state.labScale===1?1.35:1;renderLab();popSound();$("labMessage").textContent=state.labScale>1?"📏 It became bigger! The shape name did not change.":"📏 Size changed back — it is still the same shape.";speak(state.labScale>1?`The ${shapes[state.currentShapeIndex].name.toLowerCase()} became bigger. Its shape did not change.`:`The size changed back. It is still a ${shapes[state.currentShapeIndex].name.toLowerCase()}.`);});
+$("labInspectBtn").addEventListener("click",()=>{renderLab();cornerSound();const s=shapes[state.currentShapeIndex];$("labMessage").textContent=s.kind==='circle'?"🔍 Inspect: 0 straight sides, 1 curved side and 0 corners.":`🔍 Inspect: ${s.sides} straight sides and ${s.corners} corners.`;speak(labSpeech());});
+
+$("soundToggle").addEventListener("click",()=>{
+  state.sound=!state.sound;
+  $("soundToggle").textContent=state.sound?"🔊":"🔇";
+  $("soundToggle").setAttribute("aria-label",state.sound?"Turn sound off":"Turn sound on");
+  $("soundToggle").title=state.sound?"Sound on":"Sound off";
+  if(state.sound) { state.voiceEnabled=true; voiceGeneration++; beep(700,.08); speak('Sound and voice are on.'); }
+  else { stopVoice(); stopMusic(); }
+});
+$("generateCertificateBtn").addEventListener("click",()=>{popSound();generateCertificate();});
+$("printCertificateBtn").addEventListener("click",()=>{popSound();printCertificate();});
+$("backFromCertificateBtn").addEventListener("click",()=>{popSound();try{speechSynthesis.cancel();}catch(e){}setScreen("learnScreen");});
+
+$("startBtn").addEventListener("click",()=>{startSound();startMusic();setScreen("learnScreen")});
+$("learnStartBtn").addEventListener("click",()=>{startSound();if(!state.music)startMusic();openShape(0)});
+document.querySelectorAll("[data-shape-nav]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    popSound();
+    openShape(Number(btn.dataset.shapeNav));
+  });
+});
+document.querySelectorAll("[data-nav=home]").forEach(btn=>{
+  btn.addEventListener("click",()=>{popSound();setScreen("learnScreen")});
+});
+document.querySelectorAll("[data-nav=lab]").forEach(btn=>{
+  btn.addEventListener("click",()=>{popSound();openLab();});
+});
+document.querySelectorAll("[data-nav=quiz]").forEach(btn=>{
+  btn.addEventListener("click",()=>{popSound();startRealWorld()});
+});
+$("nextShapeBtn").addEventListener("click",()=>{
+  const next=state.currentShapeIndex+1;
+  if(next<shapes.length) {popSound();openShape(next);}
+  else {popSound();startRealWorld();}
+});
+$("nextQuestionBtn").addEventListener("click",nextReal);
+$("retryQuizBtn").addEventListener("click",startRetry);
+$("playAgainBtn").addEventListener("click",()=>{startSound();if(!state.music)startMusic();fullReset();setTimeout(()=>setScreen("learnScreen"),80)});
+$("backStartBtn").addEventListener("click",()=>{popSound();fullReset()});
+
+// Universal button tap feedback: every button gets an audible tap unless its own
+// interaction already has a dedicated YES/NO, answer, or sound-toggle effect.
+document.addEventListener("click", e=>{
+  const btn=e.target.closest("button");
+  if(!btn || !state.sound) return;
+  popSound();
+});
+
+updateProgress("coverScreen");
+</script>
+</body>
+</html>
